@@ -21,6 +21,12 @@ func HandleShorten(store Storage) http.HandlerFunc {
 			return
 		}
 
+		// Проверка на пустой URL
+		if req.URL == "" {
+			http.Error(w, "URL cannot be empty", http.StatusBadRequest)
+			return
+		}
+
 		shortURL, created, err := store.Save(req.URL)
 		if err != nil {
 			http.Error(w, "Failed to save URL", http.StatusInternalServerError)
@@ -30,12 +36,11 @@ func HandleShorten(store Storage) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		status := http.StatusCreated
 		if !created {
-			status = http.StatusOK // Если URL уже существовал
+			status = http.StatusOK
 		}
 		w.WriteHeader(status)
 		json.NewEncoder(w).Encode(Response{ShortURL: shortURL})
 	}
-
 }
 
 func HandleRedirect(store Storage) http.HandlerFunc {

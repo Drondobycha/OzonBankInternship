@@ -1,33 +1,37 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"my_project/inmemory"
 	postgres "my_project/postgreSQL"
 	"net/http"
+	"os"
 )
 
 func main() {
-	storageType := flag.String("storage", "memory", "Тип хранилища (memory или postgres)")
-	postgresConnStr := flag.String("postgres-conn", "postgres://OzonBankTest:12345678@localhost5432/url_shortener?sslmode=disable", "Строка подключения к PostgreSQL")
-	flag.Parse()
+	storageMode := os.Getenv("STORAGE_MODE")
 
 	var store Storage
-	var err error
-
-	switch *storageType {
-	case "memory":
-		store = inmemory.NewUrlStore() // Использование пакета memory
+	switch storageMode {
+	case "inmemory":
+		store = inmemory.NewUrlStore()
 	case "postgres":
-		store, err = postgres.NewURLStore(*postgresConnStr)
+		connStr := os.Getenv("DATABASE_URL")
+		if connStr == "" {
+			log.Fatal("DATABASE_URL is not set")
+		}
+		var err error
+		store, err = postgres.NewURLStore(connStr)
 		if err != nil {
-			log.Fatalf("Failed to initialize PostgreSQL storage: %v", err)
+			log.Fatalf("Failed to create PostgreSQL store: %v", err)
 		}
 	default:
-		log.Fatalf("Unknown storage type: %s", *storageType)
+		log.Fatalf("Unknown storage mode: %s", storageMode)
 	}
+
+	// Используем store в вашем сервисе
+	fmt.Println("Storage mode:", storageMode)
 	// Запуск сервера
 	http.HandleFunc("/shorten", HandleShorten(store))
 
