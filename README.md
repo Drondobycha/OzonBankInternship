@@ -61,7 +61,7 @@
    curl -X POST -H "Content-Type: application/json" -d '{"url": "https://www.exampl.com"}' http://localhost:3000/shorten
    ```
    ```bash
-   curl http://localhost:3000/redirect/{сокращённый url}
+   curl http://localhost:3000/redirect/сокращённый_url
    ```
 
 ## Запуск тестов
