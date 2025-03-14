@@ -55,6 +55,14 @@
     ```
 Сервис будет доступен по адресу: http://localhost:3000, а PostgreSQL — на порту 5432.
 
+## Пример запросов к серверу
+   ```bash
+   curl -X POST -H "Content-Type: application/json" -d '{"url": "https://www.exampl.com"}' http://localhost:3000/shorten
+   ```
+   ```bash
+   curl http://localhost:3000/redirect/{сокращённый url}
+   ```
+
 ## Запуск тестов
 
 Для запуска тестов необходимо установить Go на ваш компьютер.
